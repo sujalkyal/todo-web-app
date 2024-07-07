@@ -2,8 +2,10 @@ const express=require('express');
 const app= express();
 const {createTodo,updateTodo} = require('./types');
 const {Todos} = require("./db");
+const cors = require('cors');
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/todos",async (req,res)=>{
     
@@ -20,7 +22,7 @@ app.post("/todo",async (req,res)=>{
     if(!parsedPayload.success){
         res.status(411).json({
             msg: "You sent the wrong inputs",
-        })
+        });
         return;
     }
     
@@ -28,17 +30,17 @@ app.post("/todo",async (req,res)=>{
         title: createPayload.title,
         description: createPayload.description,
         completed: false
-    })
+    });
 
     res.status(200).json({
         msg: "Todo created"
-    })
+    });
 
 });
 
 app.put("/completed",async (req,res)=>{
     const updatePayload = req.body;
-    const parsedPayload = updateTodo.safeParse(todoId);
+    const parsedPayload = updateTodo.safeParse(updatePayload);
 
     if(!parsedPayload.success){
         res.status(411).json({
@@ -47,7 +49,7 @@ app.put("/completed",async (req,res)=>{
     }
 
     await Todos.updateOne({
-        _id: updatePayload.Id
+        _id: updatePayload.id
     },{
         completed: true
     });
